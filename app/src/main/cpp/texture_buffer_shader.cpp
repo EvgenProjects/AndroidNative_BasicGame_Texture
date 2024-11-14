@@ -211,29 +211,31 @@ bool ShaderOpenGL::Create()
 {
 	m_ShaderId = 0;
 
-	char vertexShaderStr[] =
-			"attribute vec3 aPos; \n"
-			"attribute vec2 aTexCoord; \n"
-			" \n"
-			"varying vec2 TexCoord; \n"
-			" \n"
-			"void main() \n"
-			"{ \n"
-			"	gl_Position = vec4(aPos, 1.0); \n"
-			"	gl_Position.x = gl_Position.x * 2.0 - 1.0; \n" // I use x from [0, 1] in my files. This line converts x from [0, 1] -> openGL standard [-1, 1]
-			"	gl_Position.y = -(gl_Position.y * 2.0 - 1.0); \n" // I use y from [0, 1] in my files. This line converts y from [0, 1] -> openGL standard [1, -1]
-			"	TexCoord = vec2(aTexCoord.x, aTexCoord.y); \n"
-			"} \n";
+	const char* vertexShaderStr = R"(
+			attribute vec3 aPos;
+			attribute vec2 aTexCoord;
 
-	char fragmentShaderStr[] =
-			"precision mediump float; \n"
-			"varying vec2 TexCoord; \n"
-			" \n"
-			"uniform sampler2D textureGood; \n"
-			"void main() \n"
-			"{ \n"
-			"   gl_FragColor = texture2D(textureGood, TexCoord); \n"
-			"} \n";
+			varying vec2 TexCoord;
+
+			void main()
+			{
+				gl_Position = vec4(aPos, 1.0);
+				gl_Position.x = gl_Position.x * 2.0 - 1.0;  // I use x from [0, 1] in my files. This line converts x from [0, 1] -> openGL standard [-1, 1]
+				gl_Position.y = -(gl_Position.y * 2.0 - 1.0);  // I use y from [0, 1] in my files. This line converts y from [0, 1] -> openGL standard [1, -1]
+				TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+			}
+	)";
+
+	const char* fragmentShaderStr = R"(
+			precision mediump float;
+			varying vec2 TexCoord;
+
+			uniform sampler2D textureGood;
+			void main()
+			{
+			   gl_FragColor = texture2D(textureGood, TexCoord);
+			}
+	)";
 
 	GLuint vertexShader;
 	GLuint fragmentShader;
