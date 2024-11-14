@@ -5,6 +5,28 @@
 #include "texture_buffer_shader.h"
 
 #include <string>
+#include "texture_buffer_shader.h"
+
+#include <unistd.h>
+
+bool WaitOpenGlStatus(int goodOpenGlStatus, int waitSeonds)
+{
+	timespec timeNow1;
+	clock_gettime(CLOCK_MONOTONIC, &timeNow1);
+
+	while (true)
+	{
+		if (glGetError()==goodOpenGlStatus)
+			return true;
+
+		sleep(1); // sleep 1 second
+
+		timespec timeNow2;
+		clock_gettime(CLOCK_MONOTONIC, &timeNow2);
+		if ((timeNow2.tv_sec- timeNow1.tv_sec)>waitSeonds)
+			return false;
+	};
+}
 
 /////////// class TextureImageOpenGL //////////////
 TextureImageOpenGL::TextureImageOpenGL()
@@ -37,8 +59,7 @@ bool TextureImageOpenGL::Create(AAssetManager* pAssetManager, const char* filena
 
 	glTexImage2D(GL_TEXTURE_2D, 0, imgFormat, width, height, 0, imgFormat, GL_UNSIGNED_BYTE, pColorData);
 
-	int status = glGetError();
-	if (status == GL_NO_ERROR) // good
+	if (WaitOpenGlStatus(GL_NO_ERROR, 5 /*seconds to finish wait*/))
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
